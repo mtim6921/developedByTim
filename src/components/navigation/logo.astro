@@ -1,0 +1,46 @@
+---
+const { className } = Astro.props;
+---
+
+<div class={`logo ${className || ''}`}>
+  <div></div>
+</div>
+
+<style>
+  .logo {
+    width: 56px;
+    height: 56px;
+    position: relative;
+    padding: 6px;
+  }
+  .logo div {
+    content: '';
+    background-color: rgb(182, 182, 182);
+    width: 44px;
+    height: 44px;
+    position: relative;
+    opacity: 0.9;
+  }
+  .logo::before {
+    position: absolute;
+    content: '';
+    background-color: rgb(30, 30, 30);
+    top: 0;
+    left: 0;
+    width: 26px;
+    height: 18px;
+    opacity: 0.7;
+  }
+  .logo::after {
+    position: absolute;
+    background-color: rgb(30, 30, 30);
+    content: '';
+    bottom: 0;
+    right: 0;
+    width: 18px;
+    height: 26px;
+    opacity: 0.7;
+  }
+
+  /* Allow user-specified classes to overwrite the default styling */
+</style>
