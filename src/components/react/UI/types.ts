@@ -37,7 +37,7 @@ export enum FilmStockType {
       ISO1600 = 1600,
       ISO3200 = 3200
   }
- 
+
   export enum FilmFormatType
   {
       Format35mm,
