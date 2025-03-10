@@ -3,45 +3,33 @@ import Dropdown from "../UI/Dropdown"; // Assuming your Dropdown is imported
 import { filmSpeedOptions, filmStockOptions, filmFormatOptions, filmOrientationOptions } from '../uploadWindow/UploadWindow'; // Update the import paths based on your project structure
 import SearchInput from "../UI/SearchInput"; // Update if necessary
 import { FilmSpeedType, FilmStockType, FilmFormatType, FilmOrientationType } from "../UI/types"; // Assuming you have the necessary types
+import Loading from '../UI/Loading';
+import useFetchImages from './useFetchImages';
 
 // Assuming Image type is defined somewhere
-interface Image {
-    id: string;
-    fileName: string;
-    url: string;
-    filmStock: string;
-    filmSpeed: FilmSpeedType;
-    filmFormat: FilmFormatType;
-    filmOrientation: FilmOrientationType;
-    bw: boolean;
-}
+
 
 export default function ImageGallery() {
     // States for dropdown values
-    const [filmSpeed, setFilmSpeed] = useState<FilmSpeedType | string>(''); 
+    const [filmSpeed, setFilmSpeed] = useState<FilmSpeedType | string>('');
     const [filmStock, setFilmStock] = useState<FilmStockType | string>('');
     const [filmFormat, setFilmFormat] = useState<FilmFormatType | string>('');
     const [filmOrientation, setFilmOrientation] = useState<FilmOrientationType | string>('');
+  
     const [sortBy, setSortBy] = useState<string>('');
+    const {images, loading:loadingData} = useFetchImages(filmSpeed,filmStock, filmFormat, filmOrientation, sortBy)
+    const [loading, setLoading] = useState<boolean>(true);
 
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const imagesPerPage = 3;
+    const startIndex = (currentPage - 1) * imagesPerPage;
+    const endIndex = startIndex + imagesPerPage;
+    const displayedImages = images.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(images.length / imagesPerPage);
+    const [loadedImagesCount, setLoadedImagesCount] = useState<number>(0);
     // State to store fetched images
-    const [images, setImages] = useState<Image[]>([]);
-
-    // Fetch images on initial render
-    useEffect(() => {
-        const fetchImages = async () => {
-            try {
-                const response = await fetch("https://localhost:7115/api/Image");
-                if (!response.ok) throw new Error("Failed to fetch images");
-                const data = await response.json();
-                setImages(data); // Assuming the response is an array of image objects
-            } catch (error) {
-                console.error("Error fetching images:", error);
-            }
-        };
-
-        fetchImages();
-    }, []);
+ 
 
     const handleUpdate = () => {
         // Handle update logic when any filter is changed
@@ -54,6 +42,13 @@ export default function ImageGallery() {
         });
         // You could refetch or filter images based on the updated state here
     };
+
+    useEffect(() => {
+        if (loadedImagesCount === images.length) {
+            setLoading(false);
+        }
+    }, [loadedImagesCount, images.length]) 
+
 
     return (
         <div>
@@ -95,12 +90,13 @@ export default function ImageGallery() {
                     />
                 </div>
             </div>
-
+            {/* Loading Indicator */}
+            {(loadingData ||loading ) &&  <Loading />} 
             {/* Images Display Section */}
             <div className="grid grid-cols-4 gap-4 mt-8">
-                {images.map((image) => (
+                {displayedImages.map((image) => (
                     <div key={image.id} className="border p-4">
-                        <img src={image.url} alt={image.fileName} className="w-full h-auto" />
+                        <img  onLoad={() => setLoadedImagesCount((count) => count + 1)} src={image.url} alt={image.fileName} className="w-full h-auto" />
                         <div className="text-center mt-2">
                             <h3>{image.fileName}</h3>
                             <p>{`ISO: ${image.filmSpeed}, Stock: ${image.filmStock}, Format: ${image.filmFormat}`}</p>
@@ -108,6 +104,26 @@ export default function ImageGallery() {
                         </div>
                     </div>
                 ))}
+            </div>
+
+
+            {/* Pagination Controls */}
+            <div className="flex justify-center items-center gap-4 mt-6">
+                <button
+                    className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                >
+                    Previous
+                </button>
+                <span>Page {currentPage} of {totalPages}</span>
+                <button
+                    className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                >
+                    Next
+                </button>
             </div>
         </div>
     );

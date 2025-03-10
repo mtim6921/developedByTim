@@ -10,26 +10,26 @@ export const filmOrientationOptions: DropdownOptions<any>[] = Object.entries(Fil
     text,
   }));
  // Film Stock Options
-export const filmStockOptions: DropdownOptions<any>[] = Object.entries(FilmStockType).map(([key, text]) => ({
+export const filmStockOptions: DropdownOptions<any>[] = [{key:'', text: 'All'},...Object.entries(FilmStockType).map(([key, text]) => ({
     key,
-    text,
-  }));
+    text: text ?? 'All',
+  }))]
   
   // Film Speed (ISO) Options
-  export const filmSpeedOptions: DropdownOptions<any>[] = Object.values(FilmSpeedType)
+  export const filmSpeedOptions: DropdownOptions<any>[] = [{key:'', text: 'All'},...Object.values(FilmSpeedType)
     .filter((v) => typeof v === "number") // Ensures we only get numeric values
     .map((iso) => ({
       key: iso,
-      text: `ISO ${iso}`,
-    }));
+      text: iso?`ISO ${iso}`:'All',
+    }))]
   
   // Film Format Options
-  export const filmFormatOptions: DropdownOptions<any>[] = Object.keys(FilmFormatType)
+  export const filmFormatOptions: DropdownOptions<any>[] =[{key:'', text: 'All'},...Object.keys(FilmFormatType)
     .filter((key) => isNaN(Number(key))) // Filters out numeric index keys
     .map((format) => ({
       key: format,
       text: format.replace("Format", "").replace(/([A-Z])/g, " $1").trim(),
-    }));
+    }))]
   
   // Film Color Options
   export const filmColorOptions: DropdownOptions<any>[] = Object.entries(FilmColorType).map(([key, text]) => ({

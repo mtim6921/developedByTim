@@ -53,3 +53,16 @@ export enum FilmStockType {
     Portrait = "Portrait",
     Square = "Square"
   }
+
+  export type Image = {
+      id: string;
+      fileName: string;
+      url: string;
+      filmStock: string;
+      filmSpeed: FilmSpeedType;
+      filmFormat: FilmFormatType;
+      filmOrientation: FilmOrientationType;
+      bw: boolean;
+      uploadedAt: string;
+      metadata: string;
+  }
